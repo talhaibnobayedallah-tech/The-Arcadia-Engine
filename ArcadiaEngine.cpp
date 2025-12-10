@@ -26,18 +26,18 @@ class ConcretePlayerTable : public PlayerTable {
 private:
     static const int TABLE_SIZE = 1007;
 
-    struct profile {
+    struct Profile {
         int ID;
         string name;
         bool used;
 
-        profile() {
+        Profile() {
             ID = 0;
             name = "";
             used = false;
         }
     };
-    vector<profile> table;
+    vector<Profile> table;
 
     int h1(int key) {
         double A = 0.618033;
@@ -51,7 +51,7 @@ private:
 
 public:
     ConcretePlayerTable() {
-        table = vector<profile>(TABLE_SIZE);
+        table = vector<Profile>(TABLE_SIZE);
     }
 
     void insert(int playerID, string name) override {
@@ -125,12 +125,26 @@ public:
 
 class ConcreteAuctionTree : public AuctionTree {
 private:
-    // TODO: Define your Red-Black Tree node structure
-    // Hint: Each node needs: id, price, color, left, right, parent pointers
+    struct Node{
+        int id;
+        int price;
+        char color;
+        Node* left;
+        Node* right;
+        Node* parent;
+
+        Node(int itemID, int itemPrice) : id(itemID), price(itemPrice), color('R'), left(nullptr), right(nullptr), parent(nullptr) {}
+    };
+    Node* root;
+
+    
 
 public:
     ConcreteAuctionTree() {
-        // TODO: Initialize your Red-Black Tree
+        Node* NIL = new Node(-1, 0);
+        NIL->color = 'B';
+        NIL->left = NIL->right = NIL->parent = NIL;
+        root = NIL;
     }
 
     void insertItem(int itemID, int price) override {

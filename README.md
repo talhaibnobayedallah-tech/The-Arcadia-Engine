@@ -3,10 +3,7 @@ Your team has been hired by Arcadia Games to build the backend engine for their 
 
 # Tasks
 - PART A: REGISTORY (Data Structure)
-  1. Class PlayerTable (Double Hashing)
-     - Constructor --> **not done**
-     - Insert --> **not done**
-     - Search --> **not done**
+  1. Class PlayerTable (Double Hashing) --> **done**
   
   2. Class Leaderboard (Skip List)
      - Constructor --> **not done**

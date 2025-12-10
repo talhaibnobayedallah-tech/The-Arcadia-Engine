@@ -1,5 +1,5 @@
 # The-Arcadia-Engine
-Your team has been hired by Arcadia Games to build the backend engine for their new MMORPG (Massively Multiplayer Online Role-Playing Game). The game requires a highperformance system to handle player data, inventory management, world naviga􀆟on, and server task scheduling.
+Your team has been hired by Arcadia Games to build the backend engine for their new MMORPG (Massively Multiplayer Online Role-Playing Game). The game requires a highperformance system to handle player data, inventory management, world navigation, and server task scheduling.
 
 # Tasks
 - PART A: REGISTORY (Data Structure)
@@ -44,7 +44,7 @@ Your team has been hired by Arcadia Games to build the backend engine for their 
   - Path O(V+E), MST O(E log V), All-Pairs Shortest Path - APSP O(V³)
   - Scheduler O(n log n)
     
-- in getTopN, Return 􀆟ed players in any order, but ensure all top-scoring players appear before lowerscoring ones.
+- in getTopN, Return tied players in any order, but ensure all top-scoring players appear before lowerscoring ones.
 
 # Contributors
 BadrEldeen - [Badreldeen2006](https://github.com/Badreldeen2006)

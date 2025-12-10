@@ -24,21 +24,71 @@ using namespace std;
 
 class ConcretePlayerTable : public PlayerTable {
 private:
-    // TODO: Define your data structures here
-    // Hint: You'll need a hash table with double hashing collision resolution
+    static const int TABLE_SIZE = 1007;
+
+    struct profile {
+        int ID;
+        string name;
+        bool used;
+
+        profile() {
+            ID = 0;
+            name = "";
+            used = false;
+        }
+    };
+    vector<profile> table;
+
+    int h1(int key) {
+        double A = 0.618033;
+        return int(TABLE_SIZE * (key * A - floor(key * A)));  // h1(k) = floor(n(kA mod 1))
+    }
+
+    int h2(int key) {
+        int primary = 997;
+        return primary - (key % primary);
+    }
 
 public:
     ConcretePlayerTable() {
-        // TODO: Initialize your hash table
+        table = vector<profile>(TABLE_SIZE);
     }
 
     void insert(int playerID, string name) override {
-        // TODO: Implement double hashing insert
-        // Remember to handle collisions using h1(key) + i * h2(key)
+        int index1 = h1(playerID);
+        int index2 = h2(playerID);
+
+        int i = 1;
+        int ndx = index1;
+        while (table[ndx].used && ndx < TABLE_SIZE) {  // If a collision occured.
+            ndx = (index1 + i * index2) % TABLE_SIZE;
+            i++;
+        }
+
+        if (ndx >= TABLE_SIZE) {
+            cout << "ID: " << playerID << " can't be inserted" << endl;
+        } else {
+            table[ndx].ID = playerID;
+            table[ndx].name = name;
+            table[ndx].used = true;
+        }
     }
 
     string search(int playerID) override {
-        // TODO: Implement double hashing search
+        int index1 = h1(playerID);
+        int index2 = h2(playerID);
+
+        int i = 1;
+        int ndx = index1;
+        while (table[ndx].used && ndx < TABLE_SIZE) {  // If it found element at this index
+            if (playerID == table[ndx].ID) {
+                return table[ndx].name;
+            }
+
+            ndx = (index1 + i * index2) % TABLE_SIZE;
+            i++;
+        }
+
         // Return "" if player not found
         return "";
     }

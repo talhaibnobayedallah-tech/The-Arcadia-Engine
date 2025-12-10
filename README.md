@@ -1,5 +1,5 @@
 # The-Arcadia-Engine
-Your team has been hired by Arcadia Games to build the backend engine for their new MMORPG (Massively Mul􀆟player Online Role-Playing Game). The game requires a highperformance system to handle player data, inventory management, world naviga􀆟on, and server task scheduling.
+Your team has been hired by Arcadia Games to build the backend engine for their new MMORPG (Massively Multiplayer Online Role-Playing Game). The game requires a highperformance system to handle player data, inventory management, world naviga􀆟on, and server task scheduling.
 
 # Tasks
 - PART A: REGISTORY (Data Structure)

@@ -44,6 +44,9 @@ Your team has been hired by Arcadia Games to build the backend engine for their 
   - Path O(V+E), MST O(E log V), All-Pairs Shortest Path - APSP O(V³)
   - Scheduler O(n log n)
     
+- Do not modify ArcadiaEngine.h under any circumstances.
+- You may add private helper functions or struct in ArcadiaEngine.cpp.
+- All team members must understand all parts of the project.
 - in getTopN, Return tied players in any order, but ensure all top-scoring players appear before lowerscoring ones.
 
 # Contributors

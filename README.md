@@ -10,10 +10,7 @@ Your team has been hired by Arcadia Games to build the backend engine for their 
      - removePlayer --> **not done**
      - getTopN --> **not done**
 
-  3. Class AuctionTree (Red-Black Tree)
-     - Constructor --> **done**
-     - insertItem --> **done**
-     - deleteItem --> **not done**
+  3. Class AuctionTree (Red-Black Tree) --> **done**
 
 - PART B: INVENTORY SYSTEM (Dynamic Programming)
   1. optimizeLootSplit --> **not done**

@@ -39,9 +39,10 @@ private:
     };
     vector<Profile> table;
 
+    // Multiplication method --> h1(k) = floor(n(kA mod 1))
     int h1(int key) {
         double A = 0.618033;
-        return int(TABLE_SIZE * (key * A - floor(key * A)));  // h1(k) = floor(n(kA mod 1))
+        return int(TABLE_SIZE * (key * A - floor(key * A)));
     }
 
     int h2(int key) {
@@ -60,7 +61,7 @@ public:
 
         int i = 1;
         int ndx = index1;
-        while (table[ndx].used && ndx < TABLE_SIZE) {  // If a collision occured.
+        while (table[ndx].used && ndx < TABLE_SIZE) {  // If a collision occurred.
             ndx = (index1 + i * index2) % TABLE_SIZE;
             i++;
         }
@@ -125,7 +126,7 @@ public:
 
 class ConcreteAuctionTree : public AuctionTree {
 private:
-    struct Node{
+    struct Node {
         int id;
         int price;
         char color;
@@ -137,6 +138,70 @@ private:
     };
     Node* NIL;
     Node* root;
+
+    struct hashTable {
+        int ID;
+        Node* node;
+        bool used;
+
+        hashTable() {
+            ID = 0;
+            node = nullptr;
+            used = false;
+        }
+    };
+
+    vector<hashTable> map;
+    static const int MAP_SIZE  = 1007;
+
+    int h1(int key) {
+        double A = 0.618033;
+        return int(MAP_SIZE  * (key * A - floor(key * A)));  // h1(k) = floor(n(kA mod 1))
+    }
+
+    int h2(int key) {
+        int primary = 997;
+        return primary - (key % primary);
+    }
+
+    void mapInsert(int ID, Node* node) {
+        int index1 = h1(ID);
+        int index2 = h2(ID);
+
+        int i = 1;
+        int ndx = index1;
+        while (map[ndx].used && ndx < MAP_SIZE ) {  // If a collision occurred.
+            ndx = (index1 + i * index2) % MAP_SIZE ;
+            i++;
+        }
+
+        if (ndx >= MAP_SIZE ) {
+            cout << "ID: " << ID << " can't be inserted" << endl;
+        } else {
+            map[ndx].ID = ID;
+            map[ndx].node = node;
+            map[ndx].used = true;
+        }
+    }
+
+    Node* mapSearchAndRemove(int ID) {
+        int index1 = h1(ID);
+        int index2 = h2(ID);
+
+        int i = 1;
+        int ndx = index1;
+        while (map[ndx].used && ndx < MAP_SIZE ) {  // If it found element at this index
+            if (ID == map[ndx].ID) {
+                map[ndx].used = false;
+                return map[ndx].node;
+            }
+
+            ndx = (index1 + i * index2) % MAP_SIZE ;
+            i++;
+        }
+
+        return nullptr;
+    }
 
     void rotateLeft(Node* x) {
         Node* y = x->right;
@@ -160,6 +225,24 @@ private:
         else y->parent->left = x;
         x->right = y;
         y->parent = x;
+    }
+
+    Node* minimum(Node* node) {
+        while (node->left != NIL) {
+            node = node->left;
+        }
+        return node;
+    }
+
+    void transplant(Node* u, Node* v) {  // delete --> (replace one subtree with another)
+        if (u->parent == NIL) {
+            root = v;
+        } else if (u == u->parent->left) {
+            u->parent->left = v;
+        } else {
+            u->parent->right = v;
+        }
+        v->parent = u->parent;
     }
 
     void fixInsert(Node* z) {
@@ -207,12 +290,79 @@ private:
         root->color = 'B';
     }
 
+    void fixDelete(Node* x) {
+        while (x != root && x->color == 'B') {
+            if (x == x->parent->left) {
+                Node* sibling = x->parent->right;
+
+                // CASE: The Sibling Is Red
+                if (sibling->color == 'R') {
+                    sibling->color = 'B';
+                    x->parent->color = 'R';
+                    rotateLeft(x->parent);
+                    sibling = x->parent->right;
+                }
+
+                // CASE: The sibling and both its children are black
+                if (sibling->left->color == 'B' && sibling->right->color == 'B') {
+                    sibling->color = 'R';
+                    x = x->parent;
+                } else {  // CASE: the DB's sibling is black & and DB's sibling far child is black & near child is red
+                    if (sibling->right->color == 'B') {
+                        sibling->left->color = 'B';
+                        sibling->color = 'R';
+                        rotateRight(sibling);
+                        sibling = x->parent->right;
+                    }
+
+                    sibling->color = x->parent->color;
+                    x->parent->color = 'B';
+                    sibling->right->color = 'B';
+                    rotateLeft(x->parent);
+                    x = root;
+                }
+            } else {
+                Node* sibling = x->parent->left;
+
+                // CASE: The Sibling Is Red
+                if (sibling->color == 'R') {
+                    sibling->color = 'B';
+                    x->parent->color = 'R';
+                    rotateRight(x->parent);
+                    sibling = x->parent->left;
+                }
+
+                // CASE: The sibling and both its children are black
+                if (sibling->right->color == 'B' && sibling->left->color == 'B') {
+                    sibling->color = 'R';
+                    x = x->parent;
+                } else {  // CASE: the DB's sibling is black & and DB's sibling far child is black & near child is red
+                    if (sibling->left->color == 'B') {
+                        sibling->right->color = 'B';
+                        sibling->color = 'R';
+                        rotateLeft(sibling);
+                        sibling = x->parent->left;
+                    }
+
+                    sibling->color = x->parent->color;
+                    x->parent->color = 'B';
+                    sibling->left->color = 'B';
+                    rotateRight(x->parent);
+                    x = root;
+                }
+            }
+        }
+        x->color = 'B';
+    }
+
 public:
     ConcreteAuctionTree() {
         NIL = new Node(-1, 0);
         NIL->color = 'B';
         NIL->left = NIL->right = NIL->parent = NIL;
         root = NIL;
+
+        map = vector<hashTable>(MAP_SIZE );
     }
 
     void insertItem(int itemID, int price) override {
@@ -240,11 +390,48 @@ public:
         }
 
         fixInsert(z);
+        mapInsert(itemID, z);
     }
 
     void deleteItem(int itemID) override {
-        // TODO: Implement Red-Black Tree deletion
-        // This is complex - handle all cases carefully
+        Node* z = mapSearchAndRemove(itemID);
+
+        if (z == nullptr) {
+            cout << "ID not found in the tree !" << endl;
+            return;
+        }
+
+        Node* x;
+        Node* y = z;
+        char yOriginalColor = z->color;
+        if (z->left == NIL) {
+            x = z->right;
+            transplant(z, z->right);
+        } else if (z->right == NIL) {
+            x = z->left;
+            transplant(z, z->left);
+        } else {
+            y = minimum(z->right);  // Get the Successor
+            yOriginalColor = y->color;
+            x = y->right;
+
+            if (y->parent == z) {
+                x->parent = y;
+            } else {
+                transplant(y, y->right);
+                y->right = z->right;
+                y->right->parent = y;
+            }
+
+            transplant(z, y);
+            y->left = z->left;
+            y->left->parent = y;
+            y->color = z->color;
+        }
+
+        if (yOriginalColor == 'B')
+            fixDelete(x);
+        delete z;
     }
 };
 

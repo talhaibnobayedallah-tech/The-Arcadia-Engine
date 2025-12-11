@@ -11,7 +11,7 @@ Your team has been hired by Arcadia Games to build the backend engine for their 
      - getTopN --> **not done**
 
   3. Class AuctionTree (Red-Black Tree)
-     - Constructor --> **not done**
+     - Constructor --> **done**
      - insertItem --> **not done**
      - deleteItem --> **not done**
 

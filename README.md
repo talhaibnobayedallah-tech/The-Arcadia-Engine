@@ -12,7 +12,7 @@ Your team has been hired by Arcadia Games to build the backend engine for their 
 
   3. Class AuctionTree (Red-Black Tree)
      - Constructor --> **done**
-     - insertItem --> **not done**
+     - insertItem --> **done**
      - deleteItem --> **not done**
 
 - PART B: INVENTORY SYSTEM (Dynamic Programming)

@@ -135,21 +135,111 @@ private:
 
         Node(int itemID, int itemPrice) : id(itemID), price(itemPrice), color('R'), left(nullptr), right(nullptr), parent(nullptr) {}
     };
+    Node* NIL;
     Node* root;
 
-    
+    void rotateLeft(Node* x) {
+        Node* y = x->right;
+        x->right = y->left;
+        if (y->left != NIL) y->left->parent = x;
+        y->parent = x->parent;
+        if (x->parent == NIL) root = y;
+        else if (x == x->parent->left) x->parent->left = y;
+        else x->parent->right = y;
+        y->left = x;
+        x->parent = y;
+    }
+
+    void rotateRight(Node* y) {
+        Node* x = y->left;
+        y->left = x->right;
+        if (x->right != NIL) x->right->parent = y;
+        x->parent = y->parent;
+        if (y->parent == NIL) root = x;
+        else if (y == y->parent->right) y->parent->right = x;
+        else y->parent->left = x;
+        x->right = y;
+        y->parent = x;
+    }
+
+    void fixInsert(Node* z) {
+        while (z->parent && z->parent->color == 'R') {
+            if (z->parent == z->parent->parent->left) {
+                Node* uncle = z->parent->parent->right;
+                if (uncle->color == 'R') {
+                    // case 1
+                    z->parent->color = 'B';
+                    uncle->color = 'B';
+                    z->parent->parent->color = 'R';
+                    z = z->parent->parent;
+                } else {
+                    if (z == z->parent->right) {
+                        // case 2
+                        z = z->parent;
+                        rotateLeft(z);
+                    }
+                    // case 3
+                    z->parent->color = 'B';
+                    z->parent->parent->color = 'R';
+                    rotateRight(z->parent->parent);
+                }
+            } else {
+                Node* uncle = z->parent->parent->left;
+                if (uncle->color == 'R') {
+                    // case 1
+                    z->parent->color = 'B';
+                    uncle->color = 'B';
+                    z->parent->parent->color = 'R';
+                    z = z->parent->parent;
+                } else {
+                    if (z == z->parent->left) {
+                        // case 2
+                        z = z->parent;
+                        rotateRight(z);
+                    }
+                    // case 3
+                    z->parent->color = 'B';
+                    z->parent->parent->color = 'R';
+                    rotateLeft(z->parent->parent);
+                }
+            }
+        }
+        root->color = 'B';
+    }
 
 public:
     ConcreteAuctionTree() {
-        Node* NIL = new Node(-1, 0);
+        NIL = new Node(-1, 0);
         NIL->color = 'B';
         NIL->left = NIL->right = NIL->parent = NIL;
         root = NIL;
     }
 
     void insertItem(int itemID, int price) override {
-        // TODO: Implement Red-Black Tree insertion
-        // Remember to maintain RB-Tree properties with rotations and recoloring
+        Node* z = new Node(itemID, price);
+        z->left = z->right = z->parent = NIL;
+
+        Node* parent = nullptr;
+        Node* current = root;
+        while (current != NIL) {
+            parent = current;
+            if (z->price < current->price || (z->price == current->price && z->id < current->id)) {
+                current = current->left;
+            } else {
+                current = current->right;
+            }
+        }
+
+        z->parent = parent;
+        if (parent != nullptr) {
+            root = z;
+        } else if (z->price < parent->price || (z->price == parent->price && z->id < parent->id)) {
+            parent->left = z;
+        } else {
+            parent->right = z;
+        }
+
+        fixInsert(z);
     }
 
     void deleteItem(int itemID) override {

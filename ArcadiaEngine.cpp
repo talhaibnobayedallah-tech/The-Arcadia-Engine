@@ -139,70 +139,6 @@ private:
     Node* NIL;
     Node* root;
 
-    struct hashTable {
-        int ID;
-        Node* node;
-        bool used;
-
-        hashTable() {
-            ID = 0;
-            node = nullptr;
-            used = false;
-        }
-    };
-
-    vector<hashTable> map;
-    static const int MAP_SIZE  = 1007;
-
-    int h1(int key) {
-        double A = 0.618033;
-        return int(MAP_SIZE  * (key * A - floor(key * A)));  // h1(k) = floor(n(kA mod 1))
-    }
-
-    int h2(int key) {
-        int primary = 997;
-        return primary - (key % primary);
-    }
-
-    void mapInsert(int ID, Node* node) {
-        int index1 = h1(ID);
-        int index2 = h2(ID);
-
-        int i = 1;
-        int ndx = index1;
-        while (map[ndx].used && ndx < MAP_SIZE ) {  // If a collision occurred.
-            ndx = (index1 + i * index2) % MAP_SIZE ;
-            i++;
-        }
-
-        if (ndx >= MAP_SIZE ) {
-            cout << "ID: " << ID << " can't be inserted" << endl;
-        } else {
-            map[ndx].ID = ID;
-            map[ndx].node = node;
-            map[ndx].used = true;
-        }
-    }
-
-    Node* mapSearchAndRemove(int ID) {
-        int index1 = h1(ID);
-        int index2 = h2(ID);
-
-        int i = 1;
-        int ndx = index1;
-        while (map[ndx].used && ndx < MAP_SIZE ) {  // If it found element at this index
-            if (ID == map[ndx].ID) {
-                map[ndx].used = false;
-                return map[ndx].node;
-            }
-
-            ndx = (index1 + i * index2) % MAP_SIZE ;
-            i++;
-        }
-
-        return nullptr;
-    }
-
     void rotateLeft(Node* x) {
         Node* y = x->right;
         x->right = y->left;
@@ -243,6 +179,15 @@ private:
             u->parent->right = v;
         }
         v->parent = u->parent;
+    }
+
+    Node* searchItem(Node* root, int id) {
+        if (root == NIL || root->id == id) // base case
+            return root;
+
+        Node* l = searchItem(root->left, id);
+        if (l != NIL) return l;
+        return searchItem(root->right, id);
     }
 
     void fixInsert(Node* z) {
@@ -361,8 +306,6 @@ public:
         NIL->color = 'B';
         NIL->left = NIL->right = NIL->parent = NIL;
         root = NIL;
-
-        map = vector<hashTable>(MAP_SIZE );
     }
 
     void insertItem(int itemID, int price) override {
@@ -390,11 +333,10 @@ public:
         }
 
         fixInsert(z);
-        mapInsert(itemID, z);
     }
 
     void deleteItem(int itemID) override {
-        Node* z = mapSearchAndRemove(itemID);
+        Node* z = searchItem(root, itemID);
 
         if (z == nullptr) {
             cout << "ID not found in the tree !" << endl;

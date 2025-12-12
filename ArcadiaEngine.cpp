@@ -24,7 +24,7 @@ using namespace std;
 
 class ConcretePlayerTable : public PlayerTable {
 private:
-    static const int TABLE_SIZE = 1007;
+    static const int TABLE_SIZE = 101;
 
     struct Profile {
         int ID;
@@ -46,7 +46,7 @@ private:
     }
 
     int h2(int key) {
-        int primary = 997;
+        int primary = 97;
         return primary - (key % primary);
     }
 
@@ -60,18 +60,18 @@ public:
         int index2 = h2(playerID);
 
         int i = 1;
-        int ndx = index1;
-        while (table[ndx].used && ndx < TABLE_SIZE) {  // If a collision occurred.
-            ndx = (index1 + i * index2) % TABLE_SIZE;
+        int idx = index1;
+        while (table[idx].used && i <= TABLE_SIZE) {  // If a collision occurred.
+            idx = (index1 + i * index2) % TABLE_SIZE;
             i++;
         }
 
-        if (ndx >= TABLE_SIZE) {
-            cout << "ID: " << playerID << " can't be inserted" << endl;
+        if (i > TABLE_SIZE) {
+            cout << "Table is Full" << endl;
         } else {
-            table[ndx].ID = playerID;
-            table[ndx].name = name;
-            table[ndx].used = true;
+            table[idx].ID = playerID;
+            table[idx].name = name;
+            table[idx].used = true;
         }
     }
 
@@ -80,13 +80,13 @@ public:
         int index2 = h2(playerID);
 
         int i = 1;
-        int ndx = index1;
-        while (table[ndx].used && ndx < TABLE_SIZE) {  // If it found element at this index
-            if (playerID == table[ndx].ID) {
-                return table[ndx].name;
+        int idx = index1;
+        while (table[idx].used && i <= TABLE_SIZE) {  // If it found element at this index
+            if (playerID == table[idx].ID) {
+                return table[idx].name;
             }
 
-            ndx = (index1 + i * index2) % TABLE_SIZE;
+            idx = (index1 + i * index2) % TABLE_SIZE;
             i++;
         }
 
@@ -182,7 +182,7 @@ private:
     }
 
     Node* searchItem(Node* root, int id) {
-        if (root == NIL || root->id == id) // base case
+        if (root == NIL || root->id == id)
             return root;
 
         Node* l = searchItem(root->left, id);
@@ -309,43 +309,43 @@ public:
     }
 
     void insertItem(int itemID, int price) override {
-        Node* z = new Node(itemID, price);
-        z->left = z->right = z->parent = NIL;
+        Node* newNode = new Node(itemID, price);
+        newNode->left = newNode->right = newNode->parent = NIL;
 
-        Node* parent = nullptr;
+        Node* parent = NIL;
         Node* current = root;
         while (current != NIL) {
             parent = current;
-            if (z->price < current->price || (z->price == current->price && z->id < current->id)) {
+            if (newNode->price < current->price || (newNode->price == current->price && newNode->id < current->id)) {
                 current = current->left;
             } else {
                 current = current->right;
             }
         }
 
-        z->parent = parent;
-        if (parent != nullptr) {
-            root = z;
-        } else if (z->price < parent->price || (z->price == parent->price && z->id < parent->id)) {
-            parent->left = z;
+        newNode->parent = parent;
+        if (parent == NIL) {
+            root = newNode;
+        } else if (newNode->price < parent->price || (newNode->price == parent->price && newNode->id < parent->id)) {
+            parent->left = newNode;
         } else {
-            parent->right = z;
+            parent->right = newNode;
         }
 
-        fixInsert(z);
+        fixInsert(newNode);
     }
 
     void deleteItem(int itemID) override {
         Node* z = searchItem(root, itemID);
 
-        if (z == nullptr) {
+        if (z == NIL) {
             cout << "ID not found in the tree !" << endl;
             return;
         }
 
         Node* x;
         Node* y = z;
-        char yOriginalColor = z->color;
+        char yOriginalColor = y->color;
         if (z->left == NIL) {
             x = z->right;
             transplant(z, z->right);

@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <set>
 
@@ -99,26 +100,113 @@ public:
 
 class ConcreteLeaderboard : public Leaderboard {
 private:
-    // TODO: Define your skip list node structure and necessary variables
-    // Hint: You'll need nodes with multiple forward pointers
+    struct Node {
+        int playerID;
+        int score;
+        vector<Node*> forward;
+
+        Node (int id, int sc, int level) : playerID(id), score(sc), forward(level + 1, nullptr) {}
+    };
+
+    static const int MAX_LEVEL = 8;
+    Node* header;
+    int levels;
+
+    // Flip Coin
+    int randomLevel() {
+        int level = 0;
+        while ((double)rand() / RAND_MAX < 0.5 && level < MAX_LEVEL) {
+            level++;
+        }
+        return level;
+    }
 
 public:
     ConcreteLeaderboard() {
-        // TODO: Initialize your skip list
+        header = new Node(-1, numeric_limits<int>::max(), MAX_LEVEL);
+        levels = 0;
     }
 
     void addScore(int playerID, int score) override {
-        // TODO: Implement skip list insertion
-        // Remember to maintain descending order by score
+        vector<Node*> update(MAX_LEVEL + 1);
+        Node* current = header;
+
+        for (int i = levels; i >= 0; i--) {
+            while (current->forward[i] && (current->forward[i]->score > score || (current->forward[i]->score == score && current->forward[i]->playerID < playerID))) {
+                current = current->forward[i];
+            }
+
+            // Store the last node before where we insert at level i
+            update[i] = current;
+        }
+
+        current = current->forward[0];
+
+        // Insert only if the player does not already exist
+        if (current == nullptr || current->playerID != playerID) {
+            int newLevel = randomLevel();
+
+            // If new node is taller than current list height, initialize new levels to point from header
+            if (newLevel > levels) {
+                for (int i = newLevel; i > levels; i--) {
+                    update[i] = header;
+                }
+                levels = newLevel;
+            }
+
+            Node* newNode = new Node(playerID, score, newLevel);
+
+            // Fix links
+            for (int i = 0; i <= newLevel; i++) {
+                newNode->forward[i] = update[i]->forward[i];
+                update[i]->forward[i] = newNode;
+            }
+        }
     }
 
     void removePlayer(int playerID) override {
-        // TODO: Implement skip list deletion
+        vector<Node*> update(MAX_LEVEL + 1);
+        Node* current = header;
+
+        // Find predecessors of the target node at each level
+        for (int i = levels; i >= 0; i--) {
+            while (current->forward[i] && current->forward[i]->playerID != playerID) {
+                current = current->forward[i];
+            }
+            update[i] = current;
+        }
+
+        // Target node (if it exists)
+        current = current->forward[0];
+
+        if (current) {
+            // Remove node from every level it appears in
+            for (int i = 0; i <= levels; i++) {
+                if (update[i]->forward[i] != current) {
+                    break;
+                }
+                update[i]->forward[i] = current->forward[i];
+            }
+
+            delete current;
+
+            // Reduce levels if highest levels become empty
+            while (levels > 0 and header->forward[levels] == nullptr) {
+                levels--;
+            }
+        }
     }
 
     vector<int> getTopN(int n) override {
-        // TODO: Return top N player IDs in descending score order
-        return {};
+        vector<int> topN;
+        Node* current = header->forward[0];
+
+        while (current && n--) {
+            topN.push_back(current->playerID);
+            current = current->forward[0];
+        }
+
+        return topN;
     }
 };
 
@@ -126,6 +214,7 @@ public:
 
 class ConcreteAuctionTree : public AuctionTree {
 private:
+    // Attributes
     struct Node {
         int id;
         int price;
@@ -139,6 +228,7 @@ private:
     Node* NIL;
     Node* root;
 
+    // Helpers
     void rotateLeft(Node* x) {
         Node* y = x->right;
         x->right = y->left;

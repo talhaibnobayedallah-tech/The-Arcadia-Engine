@@ -51,3 +51,5 @@ Samir Sherif - [SamirSheriff](https://github.com/SamirSheriff)
 Ahmed Nasser - [AhmedNAF](https://github.com/AhmedNAF)
 
 Mostafa Ahmed - [Kali8877](https://github.com/Kali8877)
+
+Ziad Muhammad - [biggtr](https://github.com/biggtr)

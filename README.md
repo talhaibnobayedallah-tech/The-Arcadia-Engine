@@ -2,15 +2,7 @@
 Your team has been hired by Arcadia Games to build the backend engine for their new MMORPG (Massively Multiplayer Online Role-Playing Game). The game requires a highperformance system to handle player data, inventory management, world navigation, and server task scheduling.
 
 # Tasks
-- PART A: REGISTORY (Data Structure)
-  1. Class PlayerTable (Double Hashing) --> **done**
-  
-  2. Class Leaderboard (Skip List)
-     - Constructor --> **not done**
-     - removePlayer --> **not done**
-     - getTopN --> **not done**
-
-  3. Class AuctionTree (Red-Black Tree) --> **done**
+- PART A: REGISTORY (Data Structure) --> **done**
 
 - PART B: INVENTORY SYSTEM (Dynamic Programming)
   1. optimizeLootSplit --> **not done**
@@ -26,8 +18,7 @@ Your team has been hired by Arcadia Games to build the backend engine for their 
  
   3. sumMinDistancesBinary --> **not done**
  
-- PART D: SERVER KERNEL (Greedy)
-  1. minIntervals --> **not done**
+- PART D: SERVER KERNEL (Greedy) --> **done**
 
 
 # Notes

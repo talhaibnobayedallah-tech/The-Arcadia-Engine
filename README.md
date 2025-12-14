@@ -39,9 +39,10 @@ Your team has been hired by Arcadia Games to build the backend engine for their 
   - Scheduler O(n log n)
     
 - Do not modify ArcadiaEngine.h under any circumstances.
-- You may add private helper functions or struct in ArcadiaEngine.cpp.
+- DO modify ArcadiaEngine.cpp: You have full freedom to add private helper functions, structs, or classes inside the .cpp file to organize your logic.
 - All team members must understand all parts of the project.
-- in getTopN, Return tied players in any order, but ensure all top-scoring players appear before lowerscoring ones.
+- Part A (Data Structures): NO STL containers (Map, Set, etc.) allowed for internal logic. std::vector is allowed only for storage (e.g., Skip List forward pointers).
+- Parts B, C, D: You are ALLOWED to use any standard STL containers (Vector, Queue, Map, etc.).
 
 # Contributors
 BadrEldeen - [Badreldeen2006](https://github.com/Badreldeen2006)

@@ -4,6 +4,7 @@
 #include "ArcadiaEngine.h"
 #include <algorithm>
 #include <queue>
+#include <functional>
 #include <numeric>
 #include <climits>
 #include <cmath>
@@ -499,8 +500,30 @@ long long InventorySystem::countStringPossibilities(string s) {
 
 bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, int dest) {
     // TODO: Implement path existence check using BFS or DFS
-    // edges are bidirectional
-    return false;
+    vector <int> grid[n];
+    vector <int> visited(n);
+    for (const auto& e:edges)
+    {
+        //edge is pair (1,3)
+        int first_element_in_edge_in_edges=e[0], second_element_in_edge_in_edges=e[1];
+        grid[first_element_in_edge_in_edges].push_back(second_element_in_edge_in_edges);
+        grid[second_element_in_edge_in_edges].push_back(first_element_in_edge_in_edges);
+    }
+
+    function<bool(int)> DFS = [&](int now_node) -> bool {
+            if (now_node == dest) return true;
+            visited[now_node]= true;
+            for ( const auto& i : grid[now_node] )
+            {
+                if (!visited[i] && DFS(i) )
+                {
+                    return true;
+                }
+            }
+            return false;
+
+    };
+   return DFS(source);
 }
 
 long long WorldNavigator::minBribeCost(int n, int m, long long goldRate, long long silverRate,

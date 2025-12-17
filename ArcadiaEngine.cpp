@@ -4,17 +4,18 @@
 #include "ArcadiaEngine.h"
 #include <algorithm>
 #include <queue>
-#include <functional>
 #include <numeric>
 #include <climits>
 #include <cmath>
 #include <cstdlib>
+#include <bitset>
 #include <vector>
 #include <string>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <set>
+#include <functional>
 
 using namespace std;
 
@@ -500,6 +501,8 @@ long long InventorySystem::countStringPossibilities(string s) {
 
 bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, int dest) {
     // TODO: Implement path existence check using BFS or DFS
+    // edges are bidirectional
+
     vector <int> grid[n];
     vector <int> visited(n);
     for (const auto& e:edges)
@@ -511,19 +514,19 @@ bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, i
     }
 
     function<bool(int)> DFS = [&](int now_node) -> bool {
-            if (now_node == dest) return true;
-            visited[now_node]= true;
-            for ( const auto& i : grid[now_node] )
+        if (now_node == dest) return true;
+        visited[now_node]= true;
+        for ( const auto& i : grid[now_node] )
+        {
+            if (!visited[i] && DFS(i) )
             {
-                if (!visited[i] && DFS(i) )
-                {
-                    return true;
-                }
+                return true;
             }
-            return false;
+        }
+        return false;
 
     };
-   return DFS(source);
+    return DFS(source);
 }
 
 long long WorldNavigator::minBribeCost(int n, int m, long long goldRate, long long silverRate,
@@ -532,6 +535,35 @@ long long WorldNavigator::minBribeCost(int n, int m, long long goldRate, long lo
     // roadData[i] = {u, v, goldCost, silverCost}
     // Total cost = goldCost * goldRate + silverCost * silverRate
     // Return -1 if graph cannot be fully connected
+    for (auto& connection_data:roadData)
+    {
+        // Total cost [2] means the first index relates with cost
+        long long Total_cost = connection_data[2]*goldRate + connection_data[3]* silverRate;
+        connection_data[2] = Total_cost;
+        connection_data[3]= 0;
+        
+    }
+    vector<int> p(n);
+    iota(p.begin(), p.end(), 0);
+    sort(roadData.begin(), roadData.end(), [](auto& a, auto& b) { return a[2] < b[2]; });
+    int ans = 0;
+    function<int(int)> find = [&](int x) -> int {
+        if (p[x] != x) {
+            p[x] = find(p[x]);
+        }
+        return p[x];
+    };
+    for (auto& e : roadData) {
+        int x = e[0], y = e[1], cost = e[2];
+        if (find(x) == find(y)) {
+            continue;
+        }
+        p[find(x)] = find(y);
+        ans += cost;
+        if (--n == 1) {
+            return ans;
+        }
+    }
     return -1;
 }
 
@@ -540,7 +572,57 @@ string WorldNavigator::sumMinDistancesBinary(int n, vector<vector<int>>& roads) 
     // Sum all shortest distances between unique pairs (i < j)
     // Return the sum as a binary string
     // Hint: Handle large numbers carefully
-    return "0";
+
+    //constructing the matrix suitable for algorithm of floyd-warshall
+    vector<vector<int>> graph(n,vector<int>(n,INT_MAX));
+    for (const auto& e: roads)
+    {
+        int city_i = e[0] , city_j= e[1], cost= e[2];
+        graph[city_i][city_j] = cost;
+    }
+    // I have no loops in graph If there is loops there is no meaning to have weights
+    for (int i = 0; i < n; i++)
+    {
+       graph[i][i] = 0;
+    }
+    int dist[n][n];
+
+	//just copy the graph
+	for(int i=0;i<n;++i)
+		for(int j=0;j<n;++j)
+			dist[i][j] = graph[i][j];
+
+	//Find all pairs shortest path by trying all possible paths
+	for(int k=0;k<n;++k)	//Try all intermediate nodes
+		for(int i=0;i<n;++i)	//Try for all possible starting position
+			for(int j=0;j<n;++j)	//Try for all possible ending position
+			{
+				if(dist[i][k]==INT_MAX || dist[k][j]==INT_MAX)	//SKIP if K is unreachable from i or j is unreachable from k
+					continue;
+				else if(dist[i][k]+dist[k][j] < dist[i][j])		//Check if new distance is shorter via vertex K
+					dist[i][j] = dist[i][k] + dist[k][j];
+			}
+    int sum = 0;
+    
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (dist[i][j] != INT_MAX){
+                sum += dist[i][j];
+            }
+        }
+        
+    }
+    bitset <64> b(sum);
+    string binary = b.to_string();
+    if (binary == "0")
+    {
+        return "0";
+    }
+    string final_binary = binary.substr(binary.find('1'));
+    
+    return final_binary;
 }
 
 // =========================================================
